@@ -9,7 +9,7 @@ from gi.repository import Nautilus, GObject, GLib, Gtk, GdkPixbuf
 class ColumnExtension(GObject.GObject, Nautilus.MenuProvider):
 
     def open_quickstart_gui(self, menu, file):
-        NautilusDesktopGui().show("nautilusdesktop.glade", file.get_location().get_path())
+        NautilusDesktopGui().show("{0}/nautilusdesktop.glade".format(os.path.dirname(__file__)), file.get_location().get_path())
 
     def get_file_items(self, window, files):
         if len(files) != 1:
@@ -38,17 +38,17 @@ class Handler:
     def __init__(self, builder, executable):
         self.__starter_file = ""
         self.builder = builder
-        self.window = builder.get_object("applicationWindow")
-        builder.get_object("applicationFileChooser").set_filename(executable)
+        self.window = builder.get_object("application_window")
+        builder.get_object("application_file_chooser").set_filename(executable)
 
-    def on_cancelButton_clicked(self, *args):
+    def on_cancel_button_clicked(self, *args):
         self.window.destroy()
         Gtk.main_quit(*args)
 
-    def on_saveButton_clicked(self, button):
-        title = self.builder.get_object("titleEntry").get_text()
-        categories = self.builder.get_object("categoriesEntry").get_text()
-        application_file = self.builder.get_object("applicationFileChooser").get_filename()
+    def on_save_button_clicked(self, button):
+        title = self.builder.get_object("title_entry").get_text()
+        categories = self.builder.get_object("categories_entry").get_text()
+        application_file = self.builder.get_object("application_file_chooser").get_filename()
 
         if title == "":
             self._error_dialog("Wrong input", "Title can't be empty!")
@@ -57,23 +57,23 @@ class Handler:
             self._error_dialog("Wrong input", "Application path can't be empty!")
             return
 
-        with open("{0}/.local/share/applications/nautilus-starter-{1}.desktop".format(os.path.expanduser("~"), hashlib.sha1(application_file).hexdigest()), "w+") as desktop_file:
+        with open("{0}/.local/share/applications/nautilus-desktop-{1}.desktop".format(os.path.expanduser("~"), hashlib.sha1(application_file).hexdigest()), "w+") as desktop_file:
             desktop_file.write("[Desktop Entry]\nType=Application\nName={0}\nExec={1}\nIcon={2}\nCategories={3}".format(title, application_file, self.__starter_file, categories))
 
         self.window.destroy()
         Gtk.main_quit()
 
-    def on_starterButton_clicked(self, button):
+    def on_starter_button_clicked(self, button):
         dialog = Gtk.FileChooserDialog(
             "Select image",
             self.window,
             Gtk.FileChooserAction.OPEN,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-        preview = self.builder.get_object("previewImage")
+        preview = self.builder.get_object("preview_image")
         dialog.set_preview_widget(preview)
         dialog.connect("update_preview", self.on_starterFileChooser_update_preview, preview)
 
-        application_file = self.builder.get_object("applicationFileChooser").get_filename()
+        application_file = self.builder.get_object("application_file_chooser").get_filename()
         if application_file is not None:
             dialog.set_current_folder(os.path.dirname(application_file))
 
@@ -81,7 +81,7 @@ class Handler:
 
         if response == Gtk.ResponseType.OK:
             self.__starter_file = dialog.get_filename()
-            image = self.builder.get_object("starterImage")
+            image = self.builder.get_object("starter_image")
             image.set_from_file(dialog.get_filename())
             image.set_from_pixbuf(self._scale_pixbuf(image.get_pixbuf(), 50))
 
@@ -116,7 +116,7 @@ class NautilusDesktopGui:
         builder.add_from_file(glade_file)
         builder.connect_signals(Handler(builder, executable))
 
-        window = builder.get_object("applicationWindow")
+        window = builder.get_object("application_window")
         window.show_all()
 
         Gtk.main()
