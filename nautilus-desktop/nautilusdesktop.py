@@ -57,7 +57,7 @@ class Handler:
             self._error_dialog("Wrong input", "Application path can't be empty!")
             return
 
-        with open("{0}/.local/share/applications/nautilus-desktop-{1}.desktop".format(os.path.expanduser("~"), hashlib.sha1(application_file).hexdigest()), "w+") as desktop_file:
+        with open("{0}/.local/share/applications/nautilus-desktop-{1}.desktop".format(os.path.expanduser("~"), hashlib.sha1(application_file.encode("utf-8")).hexdigest()), "w+", encoding="utf-8") as desktop_file:
             desktop_file.write("[Desktop Entry]\nType=Application\nName={0}\nExec={1}\nIcon={2}\nCategories={3}".format(title, application_file, self.__starter_file, categories))
 
         self.window.destroy()
