@@ -12,3 +12,8 @@ You need _python_ and _nautilus-python_ on your system, then run:
 sudo python setup.py install
 ```
 This will install the extension to _/usr/share/nautilus-python/extensions_.
+
+
+Note
+------------
+This forked version works on Python2, since the original version was not working on my system (Ubuntu 20.04)
